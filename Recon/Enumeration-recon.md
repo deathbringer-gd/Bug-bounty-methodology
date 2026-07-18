@@ -7,7 +7,7 @@ subdomains, exposed staging subdomains and other relevant subdomains that we can
 
 ---
 
-### Steps for enumerating subdomains
+### Steps for enumerating subdomains and their attack surface
 This will focus on enumerating as much attack surface as possible.
 
 1. Run `subfinder` to find a majority of subdomains. 
@@ -58,10 +58,10 @@ This will focus on enumerating as much attack surface as possible.
     Commands: 
     - `cat file1.txt file2.txt | sort -u > merged.txt` Merges 2 files and removes dupes.
 12. Identify high interest subdomains. Any subdomains with an interesting scan results or name, save to a file of interesting subdomains.
- 
+
 ---
 
-### Deep subdomain enumeration
+### Deep subdomain attack surface enumeration
 This will focus on enumerating as many values as possible from individual subdomains instead of dicovery in mass.
 
 1. Gather all information from wide scans of this subdomain into 1 file.
@@ -103,21 +103,3 @@ This will focus on enumerating as many values as possible from individual subdom
 7. For any api calls, attempt to enumerate more api parameters.
     Commands:
     - `ffuf -u https://target.com/api -X POST -H "Content-Type: application/json" -d '{"FUZZ":"test"}' -w "/home/g/Hacking/hacking-map/Bug bounty methodology/Recon/large.txt"`
-
-
----
-
-## draft below
-
-### JS beautifying on subdomains:
-- Get all found .js files from the endpoints.txt files by doing `grep -E "\.js($|\?)" endpoints.txt > js-files.txt`. 
-- Also do `curl -s https://target.com | grep -oE 'src="[^"]+\.js[^"]*"' > js-files.txt` to get more js files.
-- beutify specific js files using `curl -S https://target.com/file.js  | js-beautify > beautified.js grep -iE "(api.?key|secret|password|token|credential|auth)" beautified.js` to search for secrets. Use grep to search for other context specific keywords.
-- To beautify and download all javascript files, use `wget -i js-files.txt` and then beautify them as you need to.
-- Use these searches on all beautified files:
-	`grep -RniE "token|jwt|bearer|authorization|oauth|refresh" beautified/`
-	`grep -RniE "secret|apikey|api_key|password|private|key" beautified/`
-	`grep -RniE "admin|dashboard|manage|internal" beautified/`
-	`grep -RniE "debug|test|dev|staging|sandbox" beautified/`
-  and any other relevant searches.
-- Use linkfinder to find more endpoints by going to `/Hacking/tools/LinkFinder` then doing `source venv/bin/activate` then `python linkfinder.py -i target.com/jsfile.js > linkfinder.txt` and merge results with endpoints.txt
