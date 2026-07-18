@@ -100,24 +100,14 @@ This will focus on enumerating as many values as possible from individual subdom
     Commands:
     - `ffuf -u target.com/page?FUZZ=test -w "/home/g/Hacking/hacking-map/Bug bounty methodology/Recon/raft-large-words.txt"`
 
-
+7. For any api calls, attempt to enumerate more api parameters.
+    Commands:
+    - `ffuf -u https://target.com/api -X POST -H "Content-Type: application/json" -d '{"FUZZ":"test"}' -w "/home/g/Hacking/hacking-map/Bug bounty methodology/Recon/large.txt"`
 
 
 ---
 
 ## draft below
-### Interesting subdomain enumeration:
-- Keep a separate file for each interesting subdomain with its specific info in it.
-- Make a list of interesting subdomains regarding name, content or services running on them. Use grep with commonly interesting keywords if the list is large such as admin, api, prod, dev, etc.
-- Use the browser extension wappalyzer to get more information on the websites tech stack on any interesting subdomains
-- Use httpx to analyze the services running on them further with `httpx -d target.com -title -tech-detect -status-code -follow-redirects -web-server -ip -cdn -asn` then use katana to gather even more endpoints with the command `katana -u target.com -d 8 -headless -js-crawl -jsluice -kf all` save both these results to a file.
-- Run burpSuite crawler on the interesting subdomains and save endpoints to a file.
-- Go to the directory `/Hacking/tools/cloud_enum` and run `uv run python cloud_enum.py -k company_name` to search for publicly exposed cloud infrastructure.
-- Any exposed aws buckets use the command `aws s3 ls s3://bucket_name --no-sign-request --recursive` to list the content and do `aws s3 cp s3://bucket_name/path --no-sign-request` to list the content of a file.
-- Go to https://pentest-tools.com/information-gathering/google-hacking and use all templates on any interesting subdomains and save any useful results. Refer to https://ahrefs.com/blog/google-advanced-search-operators/ for any other relevant google search operators.
-- Enumerate more parameters with ffuf using `ffuf -u target.com/page?FUZZ=test -w params.txt` and merge with current parameters list for that subdomain.
-- For api parameter fuzzing use `ffuf -u https://target.com/api -X POST -H "Content-Type: application/json" -d '{"FUZZ":"test"}' -w params.txt` and merge the results with current parameters list.
-
 
 ### JS beautifying on subdomains:
 - Get all found .js files from the endpoints.txt files by doing `grep -E "\.js($|\?)" endpoints.txt > js-files.txt`. 
