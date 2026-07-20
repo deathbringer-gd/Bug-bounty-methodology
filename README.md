@@ -75,6 +75,10 @@ target.com/
 │       └── interesting_subdomain_name/
 │           ├── all-endpoints.txt
 │           ├── interesting-endpoints.md
+│           ├── endpoints-anonymous.txt
+│           ├── endpoints-user.txt
+│           ├── endpoints-admin.txt
+│           ├── authenticated-endpoint-matrix.tsv
 │           ├── cloud_storage.md
 │           ├── authentication.md
 │           ├── authorization.md

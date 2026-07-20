@@ -124,7 +124,17 @@ This phase examines one authorised subdomain in detail and preserves its context
     - Put client-side libraries, browser storage, service workers, source-map findings, and DOM data flows in `javascript-review.md`.
     - Put user journeys, feature flags, integrations, payments, invitations, and state-changing actions in `business-logic.md`.
 
-4. Discover and document API specifications, schemas, and real-time protocols. Treat every discovered route, field, operation, and event name as a lead; do not invoke mutations, state-changing RPC methods, or WebSocket events merely to test whether they exist. Check common API documentation and specification paths, baselining normal responses first and using the programme's approved rate limit.
+4. Map authenticated-only functionality and endpoints with testing accounts.
+    Create an endpoint and access matrix for each available authorised role, such as anonymous, standard user, organisation member, manager, administrator, and support user. Use only accounts, tenants, and test data that the programme permits. Keep credentials, cookies, bearer tokens, and exported proxy session files out of the recon directory and version control.
+    - Capture an unauthenticated baseline, then sign in through the normal application flow and repeat the same user journeys with each authorised role. Use browser developer tools or Burp Suite's proxy/history and crawler with session-handling rules; this preserves normal authentication without placing secrets in commands or shell history.
+    - Visit each authorised area normally: account and profile settings, organisation or tenant settings, member management, invitations, billing, support, dashboards, exports, uploads/downloads, API-key management, integrations, webhooks, audit logs, and administrative features. Record every observed page, API request, HTTP method, content type, parameter or body field names, response status, and authentication context.
+    - Export proxy history or crawler URLs for each role to separate files such as `endpoints-anonymous.txt`, `endpoints-user.txt`, and `endpoints-admin.txt`. Merge the reviewed, in-scope URL set into `all-endpoints.txt`, retaining the role-specific files as provenance.
+    - Create `authenticated-endpoint-matrix.tsv` with at least: URL or route, method, feature, role(s) observed, authentication required, tenant or object context, state-changing (`yes`/`no`/`unknown`), source (browser/proxy/client/spec), and notes. Record API details and request-shape evidence in `api-notes.md`; record roles, object ownership, and cross-tenant observations in `authorization.md`.
+    - Compare route and request inventories across roles and tenants. Prioritise routes visible only after login, client-code or specification operations not reached by the UI, admin or support functions, exports, uploads, bulk actions, API-key and webhook management, and endpoints where the same route behaves differently by role or tenant.
+    - Build a request baseline before later authorization testing: preserve a harmless representative request, its expected status and response shape, the acting role, target object owner, tenant, and whether it is read-only. Do not replay state-changing requests, modify identifiers, or switch tenants during mapping; move those hypotheses to the separately authorised authorization-testing workflow.
+    - Review browser storage, cookies, token-refresh requests, service workers, background polling, WebSocket connections, and hidden feature-flag responses while authenticated. Record endpoint and protocol metadata, but do not copy secret values into `authentication.md`, `api-notes.md`, or screenshots.
+
+5. Discover and document API specifications, schemas, and real-time protocols. Treat every discovered route, field, operation, and event name as a lead; do not invoke mutations, state-changing RPC methods, or WebSocket events merely to test whether they exist. Check common API documentation and specification paths, baselining normal responses first and using the programme's approved rate limit.
     Commands:
     - `for path in /openapi.json /openapi.yaml /swagger.json /swagger.yaml /api-docs /api-docs.json /v1/openapi.json /v2/api-docs /swagger-ui /swagger-ui/index.html /api/swagger.json /docs /redoc; do curl -sS -o "api-spec-$(echo "$path" | tr '/' '_').txt" -w "%{http_code}\t%{content_type}\t%{size_download}\t$path\n" "https://sub.target.com$path"; done > api-spec-probes.tsv`
     - Review `api-spec-probes.tsv` and retain only confirmed documentation or specification responses in `api-notes.md`. Save JSON or YAML specifications using meaningful names, for example `openapi.json` or `swagger.yaml`, before parsing them.
@@ -143,25 +153,25 @@ This phase examines one authorised subdomain in detail and preserves its context
     - Identify WebSocket and Socket.IO endpoints from browser developer tools, client code, and observed network traffic. Record the connection URL, handshake headers/cookies, namespaces, event names, message shapes, authentication timing, and whether an event changes state in `api-notes.md`. Do not send arbitrary events to enumerate a live service.
     - Search confirmed specifications and client artifacts for deprecated operations, hidden tags, admin/internal paths, mass-assignment-prone request fields, identifiers, pagination controls, upload/download endpoints, webhooks, and authorization scopes. Copy leads to `interesting-endpoints.md`.
 
-5. Crawl the host again with its known context and run the JavaScript methodology on newly discovered files.
+6. Crawl the host again with its known context and run the JavaScript methodology on newly discovered files.
     Commands:
     - `httpx -u https://sub.target.com -title -tech-detect -status-code -follow-redirects -web-server -ip -cdn -asn > technology-httpx.txt`
     - `katana -u https://sub.target.com -d 5 -headless -js-crawl -jsluice -kf all -silent > all-endpoints.txt`
     - Run the Burp Suite crawler using authorised test accounts where applicable and save exported URLs to `all-endpoints.txt`.
     - Merge unique entries from `all-endpoints.txt` into `interesting-endpoints.md` and run `Javascript-recon.md` for newly discovered JavaScript files. Copy high-value API, authentication, and client-side findings to `api-notes.md`, `authentication.md`, and `javascript-review.md`.
 
-6. Review cloud storage.
+7. Review cloud storage.
     Commands:
     - `cd /home/g/Hacking/tools/cloud_enum && uv run python cloud_enum.py -k company_name`
     - `aws s3 ls s3://bucket-name --no-sign-request` list only a confirmed, in-scope bucket.
     - `aws s3 cp s3://bucket-name/object-name ./downloaded-object --no-sign-request` download only an authorised object to a local review directory.
     - Record confirmed buckets, objects, permissions, and scope evidence in `cloud_storage.md`.
 
-7. Perform additional public-information research for the selected host.
+8. Perform additional public-information research for the selected host.
     - Record the query, date, source URL, and relevant result in the host's `notes.md`.
     - Confirm that any discovered host, bucket, or third-party service is in scope before interacting with it.
 
-8. Enumerate endpoint and API parameters only after baselining the response and confirming the method is safe.
+9. Enumerate endpoint and API parameters only after baselining the response and confirming the method is safe.
     Commands:
     - `ffuf -w "/home/g/Hacking/hacking-map/Bug bounty methodology/Recon/wordlists/raft-large-words.txt" -u "https://sub.target.com/page?FUZZ=test" -ac -rate 20 -of json -o parameter-name-fuzz.json`
     - `ffuf -w "/home/g/Hacking/hacking-map/Bug bounty methodology/Recon/wordlists/large.txt" -u "https://sub.target.com/api" -X POST -H "Content-Type: application/json" -d '{"FUZZ":"test"}' -ac -rate 20 -of json -o api-parameter-fuzz.json` run only against an authorised, non-state-changing request.
