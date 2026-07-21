@@ -1,4 +1,4 @@
-### JavaScript beautifying and reconnaissance
+# JavaScript beautifying and reconnaissance
 
 The aim of javascript analysis is to discover endpoints, parameters, exposed configuration, and functionality developers did not intend people to know about. Only collect and test assets that are in the authorised target scope.
 
