@@ -1,6 +1,6 @@
 ### Bug bounty methodology
 
-This is my own comprehensive bug bounty methodology for reconisance and explotation. Currently all the `Recon` folder is finished so far and Exploitation will be created soon, archived were my templates/first drafts. This guide is tailored to my own setup on Linux mint however anyone can follow it and setup a similar environment. Refer to the setup guide to setup all the nessarsary tools.
+This is my own comprehensive bug bounty methodology for reconisance and explotation. Currently all the `Recon` folder is close to finished so far and Exploitation is in progress, archived were my templates/first drafts. This guide is tailored to my own setup on Linux mint however anyone can follow it and setup a similar environment. Refer to the setup guide to setup all the nessarsary tools.
 
 ---
 
@@ -138,6 +138,7 @@ target.com/
 ```
 
 ---
+
 ### How to choose a programme
 
 There are lots of bug bounty programs out there and choosing the correct one is crucial. This section of my methodology demonstrates the best way to do so. This is not a perfect guide for picking programmes for all skill levels and is mainly targeted at people who are just begining bug bounty and may not have as advanced skills as some hunters. This is just what I personally follow.

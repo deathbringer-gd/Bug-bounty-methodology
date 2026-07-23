@@ -21,14 +21,14 @@ The goal of wide subdomain enumeration is to discover as much authorised attack 
 
 2. Run `dnsx` to brute-force additional subdomains, then merge all domain sources into the canonical `domains.txt` file.
     Commands:
-    - `dnsx -silent -d target.com -w "/home/g/Hacking/hacking-map/Bug bounty methodology/Recon/wordlists/namelist.txt" > domains-dnsx.txt`
+    - `dnsx -silent -d target.com -w "/home/g/Hacking/hacking-map/Bug-bounty-methodology/Recon/wordlists/namelist.txt" > domains-dnsx.txt`
     - `cat domains-subfinder.txt domains-dnsx.txt domains-manual.txt 2>/dev/null | sed 's/\.$//' | sort -u > domains.txt.tmp && mv domains.txt.tmp domains.txt`
     - Add reviewed results from certificate transparency, search engines, or other manual sources to `domains-manual.txt` before merging them.
 
 3. Enumerate virtual hosts.
     Determine the default response size or word count first, then filter that baseline to reduce wildcard and default-host false positives.
     Commands:
-    - `ffuf -w "/home/g/Hacking/hacking-map/Bug bounty methodology/Recon/wordlists/subdomains-top1million-110000.txt" -u "https://target.com/" -H "Host: FUZZ.target.com" -ac -rate 20 -of json -o ffuf-vhosts.json`
+    - `ffuf -w "/home/g/Hacking/hacking-map/Bug-bounty-methodology/Recon/wordlists/subdomains-top1million-110000.txt" -u "https://target.com/" -H "Host: FUZZ.target.com" -ac -rate 20 -of json -o ffuf-vhosts.json`
     - Review `ffuf-vhosts.json`, validate candidate hostnames with DNS or `httpx`, then add confirmed names to `domains-manual.txt` and merge them into `domains.txt`.
 
 4. Use search engines and public sources to find relevant company information. Save the query, date, source URL, and relevant result in `dorks.txt`; do not treat search snippets as confirmed findings.
@@ -173,6 +173,6 @@ This phase examines one authorised subdomain in detail and preserves its context
 
 9. Enumerate endpoint and API parameters only after baselining the response and confirming the method is safe.
     Commands:
-    - `ffuf -w "/home/g/Hacking/hacking-map/Bug bounty methodology/Recon/wordlists/raft-large-words.txt" -u "https://sub.target.com/page?FUZZ=test" -ac -rate 20 -of json -o parameter-name-fuzz.json`
-    - `ffuf -w "/home/g/Hacking/hacking-map/Bug bounty methodology/Recon/wordlists/large.txt" -u "https://sub.target.com/api" -X POST -H "Content-Type: application/json" -d '{"FUZZ":"test"}' -ac -rate 20 -of json -o api-parameter-fuzz.json` run only against an authorised, non-state-changing request.
+    - `ffuf -w "/home/g/Hacking/hacking-map/Bug-bounty-methodology/Recon/wordlists/raft-large-words.txt" -u "https://sub.target.com/page?FUZZ=test" -ac -rate 20 -of json -o parameter-name-fuzz.json`
+    - `ffuf -w "/home/g/Hacking/hacking-map/Bug-bounty-methodology/Recon/wordlists/large.txt" -u "https://sub.target.com/api" -X POST -H "Content-Type: application/json" -d '{"FUZZ":"test"}' -ac -rate 20 -of json -o api-parameter-fuzz.json` run only against an authorised, non-state-changing request.
     - Record the baseline, authentication context, rate limit, endpoint, method, and parameter in `api-notes.md`. Manually validate response differences before treating them as findings.
