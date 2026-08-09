@@ -1,4 +1,5 @@
 ### TODO
+- learn how to integrate ai in my methodology for better results and create a setup for it
 - learn how to most optimaly configure subfinder and implement a guide for that. (using out of the box subfinder finds the same domains everyone else finds)
 - add seach company names in shodan and implement more shodan utilisation in the methodology
 - learn to use and include censys in recon guides
