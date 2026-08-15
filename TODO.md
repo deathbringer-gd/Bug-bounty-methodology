@@ -1,4 +1,5 @@
 ### TODO
+- add a section on not instantly reporting, instead chaining bugs for max impact
 - add a section for how to go about searching for bugs in general, e.g instead of feature > test > bug > impact try impact > feature > bug
 - define jackpot bugs you would look for, e.g the best possible bug you could find for each feature
 - learn how to integrate ai in my methodology for better results and create a setup for it
