@@ -1,6 +1,6 @@
 ### Bug bounty methodology
 
-This is my own comprehensive bug bounty methodology for reconisance and explotation. Currently all the `Recon` folder is close to finished so far and Exploitation is in progress, archived were my templates/first drafts. This guide is tailored to my own setup on Linux mint however anyone can follow it and setup a similar environment. Refer to the setup guide to setup all the nessarsary tools.
+This is my own comprehensive bug bounty methodology for reconnaissance and exploitation. Currently all the `Recon` folder is close to finished so far and Exploitation is in progress, archived were my templates/first drafts. This guide is tailored to my own setup on Linux mint however anyone can follow it and setup a similar environment. Refer to the setup guide to setup all the necessary tools.
 
 ---
 
