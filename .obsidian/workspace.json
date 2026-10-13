@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Exploitation/user-input/xss.md",
-                "mode": "preview",
+                "file": "a.md",
+                "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "xss"
+              "title": "a"
             }
           }
         ]
@@ -190,14 +190,15 @@
   },
   "active": "cb83993fed373c21",
   "lastOpenFiles": [
-    "Exploitation/user-input/csrf.md",
+    "Recon/Enumeration-recon.md",
+    "a.md",
     "Exploitation/user-input/xss.md",
+    "Exploitation/user-input/csrf.md",
     "Exploitation/authentication/jwt.md",
     "Exploitation/attack-vetors.md",
     "README.md",
     "TODO.md",
     "Exploitation/reference-table.md",
-    "Recon/Javascript-recon.md",
-    "Recon/Enumeration-recon.md"
+    "Recon/Javascript-recon.md"
   ]
 }

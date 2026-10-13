@@ -14,10 +14,20 @@ target.com/
 │   ├── automatic-recon/
 │   │   │
 │   │   ├── notes.md
+│   │   ├── roots.txt
+│   │   ├── asn-org.txt
+│   │   ├── cidrs.txt
+│   │   ├── reverse-dns.txt
 │   │   ├── domains.txt
 │   │   ├── domains-subfinder.txt
+│   │   ├── domains-amass.txt
+│   │   ├── domains-crtsh.txt
 │   │   ├── domains-dnsx.txt
+│   │   ├── domains-permutations.txt
 │   │   ├── domains-manual.txt
+│   │   ├── dns-records.jsonl
+│   │   ├── cname-records.tsv
+│   │   ├── txt-records.tsv
 │   │   ├── live.txt
 │   │   ├── live-with-info.txt
 │   │   ├── live-hosts.txt
@@ -27,24 +37,44 @@ target.com/
 │   │   │  ├── httpx.jsonl
 │   │   │  ├── technology-inventory.tsv
 │   │   │  ├── technology-leads.txt
-│   │   │  └── whatweb.txt
+│   │   │  ├── whatweb.txt
+│   │   │  ├── wafw00f.txt
+│   │   │  └── screenshots/
+│   │   ├── content/
+│   │   │  ├── sensitive-files-sub.json
+│   │   │  ├── dirs-sub.json
+│   │   │  └── interesting-content.txt
 │   │   ├── endpoints/
 │   │   │  ├── endpoints.txt
+│   │   │  ├── urls-gau.txt
+│   │   │  ├── urls-waymore.txt
 │   │   │  ├── params-urls.txt
+│   │   │  ├── arjun-params.txt
 │   │   │  └── params.txt
 │   │   ├── javascript/
 │   │   │  ├── js-files.txt
+│   │   │  ├── js-files-archived.txt
 │   │   │  ├── live-js-files.txt
+│   │   │  ├── webpack-chunk-map.txt
 │   │   │  ├── links.txt
 │   │   │  ├── secrets.txt
+│   │   │  ├── trufflehog-js.json
+│   │   │  ├── package-names.txt
 │   │   │  ├── source-maps.txt
+│   │   │  ├── source-map-endpoints.txt
 │   │   │  ├── api-findings.txt
+│   │   │  ├── client-side-sinks.txt
+│   │   │  ├── client-side-sources.txt
+│   │   │  ├── postmessage-handlers.txt
 │   │   │  ├── client-side-findings.txt
 │   │   │  ├── js-files/
-│   │   │  └── source-maps/
+│   │   │  ├── source-maps/
+│   │   │  └── reconstructed/
 │   │   └── vulnerability_scans/
 │   │       ├── nmap-scan.txt
 │   │       ├── subdomain-takeover-scan.txt
+│   │       ├── nuclei.txt
+│   │       ├── nuclei-exposures.txt
 │   │       └── vulnerabilitys/
 │   │           ├── xss.txt
 │   │           ├── aws-keys.txt
@@ -91,6 +121,9 @@ target.com/
 │           ├── openapi-security-schemes.tsv
 │           ├── graphql-client-leads.txt
 │           ├── graphql-schema.json
+│           ├── cors-scan.txt
+│           ├── content-deep.json
+│           ├── content-api.json
 │           ├── javascript-review.md
 │           └── technology-notes.md
 │
@@ -161,14 +194,34 @@ This methodology takes place in a Linux mint environment (but will most likely w
 | Tool | Used for | Official download or installation guide |
 |---|---|---|
 | Subfinder | Passive subdomain discovery | [ProjectDiscovery Subfinder](https://github.com/projectdiscovery/subfinder) |
-| dnsx | DNS resolution and subdomain brute-forcing | [ProjectDiscovery dnsx](https://github.com/projectdiscovery/dnsx) |
+| Amass | Passive subdomain discovery and ASN/organisation intelligence | [OWASP Amass](https://github.com/owasp-amass/amass) |
+| dnsx | DNS resolution, record capture, and subdomain brute-forcing | [ProjectDiscovery dnsx](https://github.com/projectdiscovery/dnsx) |
 | httpx | HTTP probing and technology fingerprinting | [ProjectDiscovery HTTPX](https://github.com/projectdiscovery/httpx) |
-| Katana | Web crawling and JavaScript-aware endpoint discovery | [ProjectDiscovery Katana](https://github.com/projectdiscovery/katana) |
-| ffuf | Virtual-host and parameter discovery | [ffuf](https://github.com/ffuf/ffuf) |
-| GAU | Historical URL discovery | [getallurls](https://github.com/lc/gau) |
+| Katana | Web crawling and JavaScript-aware endpoint discovery (`-jsluice`) | [ProjectDiscovery Katana](https://github.com/projectdiscovery/katana) |
+| ffuf | Virtual-host, content, and parameter discovery | [ffuf](https://github.com/ffuf/ffuf) |
+| GAU | Historical URL and JavaScript discovery | [getallurls](https://github.com/lc/gau) |
 | gf | URL-pattern filtering | [gf](https://github.com/tomnomnom/gf) |
+| Nuclei | Templated takeover, CVE, misconfiguration, and exposure checks | [ProjectDiscovery Nuclei](https://github.com/projectdiscovery/nuclei) |
 | Nmap | Permitted network-service discovery | [Nmap download and guide](https://nmap.org/download.html) |
 | Subzy | Subdomain-takeover checks | [Subzy](https://github.com/PentestPad/subzy) |
+
+#### Optional discovery-breadth tools
+
+These widen coverage and are used where marked *if installed* in the recon guides. The core methodology runs without them.
+
+| Tool | Used for | Official download or installation guide |
+|---|---|---|
+| asnmap | ASN-to-CIDR expansion for root/IP discovery | [ProjectDiscovery asnmap](https://github.com/projectdiscovery/asnmap) |
+| mapcidr | CIDR range expansion | [ProjectDiscovery mapcidr](https://github.com/projectdiscovery/mapcidr) |
+| alterx | Subdomain permutation generation | [ProjectDiscovery alterx](https://github.com/projectdiscovery/alterx) |
+| waymore | Deeper historical URL discovery (Wayback, Common Crawl, URLScan) | [waymore](https://github.com/xnl-h4ck3r/waymore) |
+| Arjun | Hidden HTTP parameter discovery | [Arjun](https://github.com/s0md3v/Arjun) |
+| gowitness | Screenshotting live hosts for visual triage | [gowitness](https://github.com/sensepost/gowitness) |
+| wafw00f | WAF/CDN fingerprinting | [wafw00f](https://github.com/EnableSecurity/wafw00f) |
+| CORScanner | Cross-origin misconfiguration checks | [CORScanner](https://github.com/chenjj/CORScanner) |
+| graphw00f | GraphQL engine fingerprinting | [graphw00f](https://github.com/dolevf/graphw00f) |
+| bypass-403 | 401/403 access-control bypass testing | [bypass-403](https://github.com/iamj0ker/bypass-403) |
+| Shodan / Censys | Internet-wide host, port, and certificate intelligence | [Shodan](https://cli.shodan.io/) · [Censys](https://github.com/censys/censys-python) |
 
 #### JavaScript and technology-recon tools
 
@@ -176,6 +229,7 @@ This methodology takes place in a Linux mint environment (but will most likely w
 |---|---|---|
 | js-beautify | Beautifying JavaScript before review | [js-beautify](https://github.com/beautifier/js-beautify) |
 | LinkFinder | Extracting links and endpoints from JavaScript | [LinkFinder](https://github.com/GerbenJavado/LinkFinder) |
+| TruffleHog | Scanning JavaScript and reconstructed source for secrets | [TruffleHog](https://github.com/trufflesecurity/trufflehog) |
 | jq | Processing JSON and source maps | [jq downloads](https://jqlang.org/download/) |
 | WhatWeb | Additional technology fingerprinting | [WhatWeb](https://github.com/urbanadventurer/WhatWeb) |
 | Wappalyzer browser extension | Manual browser-side technology identification | [Wappalyzer download](https://www.wappalyzer.com/download/) |
