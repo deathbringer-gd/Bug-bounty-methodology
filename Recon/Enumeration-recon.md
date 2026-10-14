@@ -14,14 +14,14 @@ Coverage is organised so that every major attack vector has a recon source feedi
     - Record in-scope domains, excluded domains, allowed testing types, rate limits, and the required contact or user-agent header in `scope.md`, `out-of-scope.md`, and `recon/automatic-recon/notes.md`.
     - Run the commands below from `target.com/recon/automatic-recon/` and replace `target.com` with the authorised root domain.
     - Do not scan third-party hosts, cloud storage, or non-production systems unless they are explicitly in scope. Active steps below (virtual-host fuzzing, crawling, content and parameter discovery, `nuclei`, `nmap`) must only be run against hosts you have confirmed are in scope, at the programme's approved rate limit, with the programme's contact header.
-    - Several steps use tools that are optional additions to the core set. Where a tool is marked *if installed*, run it only when it is present; the core methodology still works without it. See the setup tables in `README.md` for install links.
+    - Several steps use tools that are optional additions to the core set. Where a tool is marked if installed, run it only when it is present; the core methodology still works without it. See the setup tables in `README.md` for install links.
 
 ### Steps for enumerating subdomains and their attack surface
 
 1. Discover every root domain, organisation asset, and IP range the programme owns before enumerating subdomains. Wildcard programmes often own more root domains, acquisitions, and netblocks than the single seed they advertise; missing these is the most common way to miss the whole surface. Confirm each discovered asset is in scope before touching it.
     Commands:
     - `amass intel -org "Company Name" -silent > asn-org.txt` map the organisation to its ASNs from registry data.
-    - `echo "AS12345" | asnmap -silent | mapcidr -silent | sort -u > cidrs.txt` *if installed* expand an in-scope ASN to its CIDR ranges.
+    - `echo "AS12345" | asnmap -silent | mapcidr -silent | sort -u > cidrs.txt` if installed expand an in-scope ASN to its CIDR ranges.
     - `dnsx -ptr -l cidrs.txt -resp-only -silent | sort -u > reverse-dns.txt` resolve in-scope ranges to hostnames via reverse DNS; review these for additional root domains.
     - `whois target.com` and reverse-WHOIS / favicon services (record the query and result in `dorks.txt`) to find sibling domains registered by the same organisation. For favicon correlation, compute the icon's murmur3 hash and search Shodan `http.favicon.hash:<hash>` to find hosts serving the same application.
     - Record every confirmed in-scope root domain in `roots.txt` (one per line) and run steps 2–5 for each root. Add newly discovered acquisitions and brands to your list of programmes to check against scope.
@@ -40,7 +40,7 @@ Coverage is organised so that every major attack vector has a recon source feedi
 
 4. Generate and resolve permutations of known subdomains. Environments such as `api-dev`, `admin-staging`, and `internal-2` are frequently reachable but absent from passive sources.
     Commands:
-    - `alterx -l domains.txt -silent 2>/dev/null | dnsx -silent | sort -u > domains-permutations.txt` *if installed* permute known names and keep only those that resolve.
+    - `alterx -l domains.txt -silent 2>/dev/null | dnsx -silent | sort -u > domains-permutations.txt` if installed permute known names and keep only those that resolve.
     - `cat domains.txt domains-permutations.txt | sort -u > domains.txt.tmp && mv domains.txt.tmp domains.txt`
 
 5. Resolve the full domain list and capture DNS records. `CNAME` records that point to unclaimed third-party services, and `NS`/`MX` records pointing to deprovisioned providers, are direct subdomain-takeover leads; `TXT` records disclose SaaS providers and verification tokens worth noting.
@@ -59,7 +59,7 @@ Coverage is organised so that every major attack vector has a recon source feedi
     Tools:
     - https://pentest-tools.com/information-gathering/google-hacking for example search operators.
     - https://ahrefs.com/blog/google-advanced-search-operators/ for additional search operators.
-    - Shodan (`org:"Company Name"`, `ssl.cert.subject.cn:"target.com"`, `http.favicon.hash:<hash>`) and Censys (`services.tls.certificates.leaf_data.subject.common_name:target.com`) to find exposed hosts, non-standard ports, and services not reachable from DNS enumeration. Use the web interfaces or the `shodan` / `censys` CLIs *if installed and configured*, and record only in-scope results.
+    - Shodan (`org:"Company Name"`, `ssl.cert.subject.cn:"target.com"`, `http.favicon.hash:<hash>`) and Censys (`services.tls.certificates.leaf_data.subject.common_name:target.com`) to find exposed hosts, non-standard ports, and services not reachable from DNS enumeration. Use the web interfaces or the `shodan` / `censys` CLIs if installed and configured, and record only in-scope results.
     - GitHub and GitLab code search for `target.com`, internal hostnames, and API paths to surface additional subdomains and leaked references; move confirmed secrets to the appropriate testing workflow.
 
 8. Resolve and probe the complete domain list to identify live web services.
@@ -76,8 +76,8 @@ Coverage is organised so that every major attack vector has a recon source feedi
     - `httpx -l live.txt -silent -json -sc -title -tech-detect -web-server -ip -cdn -asn -follow-redirects > technology/httpx.jsonl`
     - `jq -r '[.url, ((.status_code // "") | tostring), (.title // ""), (.webserver // ""), ((.tech // []) | join(",")), (.cdn_name // ""), ((.asn // "") | tostring)] | @tsv' technology/httpx.jsonl > technology/technology-inventory.tsv`
     - `whatweb --input-file live.txt --no-errors -a 1 > technology/whatweb.txt` use as a second, low-impact fingerprinting source if WhatWeb is installed.
-    - `wafw00f -i live.txt -o technology/wafw00f.txt` *if installed* identify the WAF/CDN in front of each host so later bypass work is targeted.
-    - `gowitness scan file -f live.txt --screenshot-path technology/screenshots/ 2>/dev/null` *if installed* screenshot every live host so you can triage the surface visually and spot login pages, admin panels, default installs, and error pages quickly.
+    - `wafw00f -i live.txt -o technology/wafw00f.txt` if installed identify the WAF/CDN in front of each host so later bypass work is targeted.
+    - `gowitness scan file -f live.txt --screenshot-path technology/screenshots/ 2>/dev/null` if installed screenshot every live host so you can triage the surface visually and spot login pages, admin panels, default installs, and error pages quickly.
     - `grep -RniE 'graphql|graphiql|swagger|openapi|/api/|socket\.io|wss://|oauth|openid|saml|stripe|paypal|s3|firebase|cloudfront|vercel|netlify|/docs/|documentation|developers?/|api-reference|/help/|/support/|/kb/|changelog|release-notes' technology/ > technology/technology-leads.txt`
     - Review `technology/technology-inventory.tsv` and `technology/technology-leads.txt`; record promising hosts and the evidence in `notes.md` before moving them to manual recon.
 
@@ -91,7 +91,7 @@ Coverage is organised so that every major attack vector has a recon source feedi
 11. Pull historical URLs from public archives and merge them into the endpoint inventory. Archived URLs frequently reveal retired-but-still-live endpoints, old API versions, and parameters that no longer appear in the live application — all high-value attack surface that crawling alone misses.
     Commands:
     - `gau --subs target.com | sort -u > endpoints/urls-gau.txt`
-    - `waymore -i target.com -mode U -oU endpoints/urls-waymore.txt 2>/dev/null` *if installed* as a second archive source (Wayback, Common Crawl, URLScan, VirusTotal).
+    - `waymore -i target.com -mode U -oU endpoints/urls-waymore.txt 2>/dev/null` if installed as a second archive source (Wayback, Common Crawl, URLScan, VirusTotal).
     - `cat endpoints/endpoints.txt endpoints/urls-gau.txt endpoints/urls-waymore.txt 2>/dev/null | sort -u > endpoints/endpoints.txt.tmp && mv endpoints/endpoints.txt.tmp endpoints/endpoints.txt`
     - Archived URLs may require authentication, may be out of scope, or may refer to retired functionality; review before testing.
 
@@ -118,20 +118,20 @@ Coverage is organised so that every major attack vector has a recon source feedi
     - `mkdir -p content`
     - `ffuf -w "/home/g/Hacking/hacking-map/Bug-bounty-methodology/Recon/wordlists/sensitive-files.txt" -u "https://sub.target.com/FUZZ" -ac -rate 20 -of json -o content/sensitive-files-sub.json` check the curated sensitive-files list first (`.git/config`, `.env`, backups, dumps).
     - `ffuf -w "/home/g/Hacking/hacking-map/Bug-bounty-methodology/Recon/wordlists/raft-large-words.txt" -u "https://sub.target.com/FUZZ" -ac -rate 20 -of json -o content/dirs-sub.json` broad directory and file discovery.
-    - `nuclei -l live.txt -tags exposure,config,backup,logs -rl 20 -o vulnerability_scans/nuclei-exposures.txt` *run only if automated scanning is permitted by the programme* to find exposed panels, config files, and information disclosure across the surface.
+    - `nuclei -l live.txt -tags exposure,config,backup,logs -rl 20 -o vulnerability_scans/nuclei-exposures.txt` run only if automated scanning is permitted by the programme to find exposed panels, config files, and information disclosure across the surface.
     - Manually verify each candidate (some `200` responses are soft-404s or wildcard pages) and record confirmed paths in `content/interesting-content.txt` with the host, path, status, and why it is interesting.
 
-15. Discover and harvest the programme's documentation. Documentation is an index of **restricted and high-value surface** — admin consoles, internal APIs, deprecated endpoints, plan-gated features, bulk tools and admin-only actions that the user interface never links to. Almost every other tester treats documentation as something to read *after* choosing a target; treat it as a recon source that decides which targets are worth your time. Changelogs and deprecation notices in particular point straight at legacy endpoints that are still live.
+15. Discover and harvest the programme's documentation. Documentation is an index of restricted and high-value surface — admin consoles, internal APIs, deprecated endpoints, plan-gated features, bulk tools and admin-only actions that the user interface never links to. Almost every other tester treats documentation as something to read after choosing a target; treat it as a recon source that decides which targets are worth your time. Changelogs and deprecation notices in particular point straight at legacy endpoints that are still live.
     Commands:
     - `mkdir -p docs` create a directory for the mirrored documentation.
     - `grep -rhoiE 'https?://[a-z0-9.-]*target\.com[^"'"'"' )>]*' content/interesting-content.txt endpoints/endpoints.txt dorks.txt 2>/dev/null | grep -iE '/(docs?|documentation|developers?|api-reference|reference|help|support|kb|knowledge|wiki|guide|manual|changelog|release-notes|security)' | sort -u > docs-urls.txt` collect documentation URLs already surfaced by earlier steps.
     - `for host in $(cat domains.txt); do curl -sS --max-time 10 "https://$host/sitemap.xml" 2>/dev/null | grep -oE 'https?://[^<]+' | grep -iE '/(docs?|developers?|api|reference|help|support|changelog|release)'; done | sort -u >> docs-urls.txt` pull documentation paths out of every in-scope host sitemap.
-    - `httpx -l <(sed 's#https\?://##' docs-urls.txt 2>/dev/null | sort -u) -silent -status-code -title -tech-detect > docs/docs-hosts.tsv` *if installed* confirm which documentation hosts actually resolve, and fingerprint whether they are GitBook, ReadMe, Mintlify, Docusaurus, Zendesk, or a custom helpdesk — third-party doc platforms leak internal names and unlinked paths.
+    - `httpx -l <(sed 's#https\?://##' docs-urls.txt 2>/dev/null | sort -u) -silent -status-code -title -tech-detect > docs/docs-hosts.tsv` if installed confirm which documentation hosts actually resolve, and fingerprint whether they are GitBook, ReadMe, Mintlify, Docusaurus, Zendesk, or a custom helpdesk — third-party doc platforms leak internal names and unlinked paths.
     - `wget -q -r -l 2 -np -k -p docs/ -i docs-urls.txt` mirror the documentation locally so it can be searched offline.
     - `for path in /docs /docs/ /documentation /developers /developer-portal /api-docs /reference /help /support /kb /wiki /changelog /CHANGELOG.md /release-notes /security.txt /.well-known/security.txt /sitemap.xml; do curl -sS -o "docs/probe-$(echo "$path" | tr '/' '_').txt" -w "%{http_code}\t%{content_type}\t%{size_download}\t$path\n" "https://sub.target.com$path"; done > docs/docs-probes.tsv` probe the common documentation paths directly on priority hosts.
     - `grep -rhoiE '[^.]*\b(only|never|must not|cannot|is not able to|restricted to|requires an? (admin|owner|administrator)|administrators only|internal use|deprecated|no longer supported|contact support|escalate to)\b[^.]*\.' docs/ 2>/dev/null | sort -u > docs-permission-claims.txt` extract the restricted-language claims worth contradicting.
     Review:
-    - Build a ranked list of **documented restricted areas** in `documentation-notes.md`. For each one, cross-reference what recon already found, using the table in the step below. A documented restriction that your own recon contradicts is the highest-value lead in this entire phase.
+    - Build a ranked list of documented restricted areas in `documentation-notes.md`. For each one, cross-reference what recon already found, using the table in the step below. A documented restriction that your own recon contradicts is the highest-value lead in this entire phase.
     - Read the changelog and deprecation notices first. Each retired feature is a URL to test; a deprecation date tells you how likely it is to still be running.
     - Read the bug bounty and security policy pages. They confirm scope boundaries, list disclosed bug classes the vendor already knows about, and often state the response targets you are working to.
     - Subprocessor, privacy, and status pages list third parties and infrastructure that form their own attack surface, sometimes with credentials scoped to your own account.
@@ -155,7 +155,7 @@ Coverage is organised so that every major attack vector has a recon source feedi
     Commands:
     - `{ grep -E '\?' endpoints/endpoints.txt; gau --subs target.com | grep '='; } | sort -u > endpoints/params-urls.txt.tmp && mv endpoints/params-urls.txt.tmp endpoints/params-urls.txt`
     - `grep -oE '[?&][^=&]+' endpoints/params-urls.txt | cut -c2- | sort -u > endpoints/params.txt`
-    - `arjun -u "https://sub.target.com/endpoint" -oT endpoints/arjun-params.txt 2>/dev/null` *if installed* discover parameters the application accepts but does not advertise; run only against an authorised, non-state-changing endpoint at the approved rate limit.
+    - `arjun -u "https://sub.target.com/endpoint" -oT endpoints/arjun-params.txt 2>/dev/null` if installed discover parameters the application accepts but does not advertise; run only against an authorised, non-state-changing endpoint at the approved rate limit.
     - Review URLs before testing: archived URLs and JavaScript findings can require authentication or refer to retired functionality.
 
 17. Scan non-web services only when service scanning is permitted by the programme.
@@ -236,14 +236,14 @@ This phase examines one authorised subdomain in detail and preserves its context
     - `jq -r '(.components.securitySchemes // .securityDefinitions // {}) | to_entries[] | [.key, (.value.type // ""), (.value.scheme // ""), (.value.in // "")] | @tsv' openapi.json > openapi-security-schemes.tsv`
     - Convert the documented paths to absolute URLs, merge them into `all-endpoints.txt`, and record whether each operation is authenticated or potentially state-changing in `api-notes.md`. Do not automatically request every endpoint.
     - For YAML specifications, use an installed YAML-aware parser or review the file manually; do not treat a JSON parser failure as evidence that a specification is invalid.
-    - Identify GraphQL from observed requests, JavaScript, technology fingerprints, or documentation. Fingerprint the engine to know which introspection and batching behaviours to expect: `python3 /home/g/Hacking/tools/graphw00f/main.py -d -f -t https://sub.target.com/graphql` *if installed*. If introspection is explicitly allowed, use a minimal schema query against the confirmed endpoint and save the response as `graphql-schema.json`; otherwise derive operation names, variables, fragments, and types from normal application traffic, persisted-query payloads, and client code.
+    - Identify GraphQL from observed requests, JavaScript, technology fingerprints, or documentation. Fingerprint the engine to know which introspection and batching behaviours to expect: `python3 /home/g/Hacking/tools/graphw00f/main.py -d -f -t https://sub.target.com/graphql` if installed. If introspection is explicitly allowed, use a minimal schema query against the confirmed endpoint and save the response as `graphql-schema.json`; otherwise derive operation names, variables, fragments, and types from normal application traffic, persisted-query payloads, and client code.
     Commands:
     - `grep -RniE 'graphql|__schema|__type|query[[:space:]]+[A-Za-z_]|mutation[[:space:]]+[A-Za-z_]|subscription[[:space:]]+[A-Za-z_]' ../../automatic-recon/javascript/js-files/ ../../automatic-recon/javascript/source-maps/ 2>/dev/null > graphql-client-leads.txt`
     - Record GraphQL queries, mutations, subscriptions, variable names, authentication context, and evidence source in `api-notes.md`. Do not execute mutations or subscriptions solely for enumeration.
     - Identify gRPC and protobuf services from response headers (`application/grpc`), client code, mobile applications, public `.proto` files, gateway routes, or documentation. Use server reflection only where explicitly permitted; otherwise record service and method names from passive sources in `api-notes.md`.
     - Identify WebSocket and Socket.IO endpoints from browser developer tools, client code, and observed network traffic. Record the connection URL, handshake headers/cookies, namespaces, event names, message shapes, authentication timing, and whether an event changes state in `api-notes.md`. Do not send arbitrary events to enumerate a live service.
     - Search confirmed specifications and client artifacts for deprecated operations, hidden tags, admin/internal paths, mass-assignment-prone request fields, identifiers, pagination controls, upload/download endpoints, webhooks, and authorization scopes. Copy leads to `interesting-endpoints.md`.
-    - Where multiple API versions were identified in the wide-scan legacy step, diff them **behaviourally** rather than by response shape alone. On the same logical operation, compare authentication requirements, authorization enforcement, rate limiting, CSRF and CORS headers, field-level validation, and error verbosity between the current and legacy version. A legacy version that accepts an operation the current one rejects, enforces weaker object checks, or returns data the current one filters, is the finding. Record the comparison in `api-notes.md` with both request shapes.
+    - Where multiple API versions were identified in the wide-scan legacy step, diff them behaviourally rather than by response shape alone. On the same logical operation, compare authentication requirements, authorization enforcement, rate limiting, CSRF and CORS headers, field-level validation, and error verbosity between the current and legacy version. A legacy version that accepts an operation the current one rejects, enforces weaker object checks, or returns data the current one filters, is the finding. Record the comparison in `api-notes.md` with both request shapes.
 
 6. Crawl the host again with its known context and run the JavaScript methodology on newly discovered files.
     Commands:
@@ -275,7 +275,7 @@ This phase examines one authorised subdomain in detail and preserves its context
     Commands:
     - `ffuf -w "/home/g/Hacking/hacking-map/Bug-bounty-methodology/Recon/wordlists/raft-large-words.txt" -u "https://sub.target.com/page?FUZZ=test" -ac -rate 20 -of json -o parameter-name-fuzz.json`
     - `ffuf -w "/home/g/Hacking/hacking-map/Bug-bounty-methodology/Recon/wordlists/large.txt" -u "https://sub.target.com/api" -X POST -H "Content-Type: application/json" -d '{"FUZZ":"test"}' -ac -rate 20 -of json -o api-parameter-fuzz.json` run only against an authorised, non-state-changing request.
-    - `arjun -u "https://sub.target.com/endpoint" -oT arjun-params.txt 2>/dev/null` *if installed* discover hidden parameters the endpoint accepts; run only against authorised, non-state-changing endpoints.
+    - `arjun -u "https://sub.target.com/endpoint" -oT arjun-params.txt 2>/dev/null` if installed discover hidden parameters the endpoint accepts; run only against authorised, non-state-changing endpoints.
     - Record the baseline, authentication context, rate limit, endpoint, method, and parameter in `api-notes.md`. Manually validate response differences before treating them as findings.
 
 11. Cross-reference the documentation against what was actually found on this host. The wide-scan documentation harvest produced `documentation-notes.md`, `docs-permission-claims.txt` and the mirrored `docs/` directory; this step is where they meet the live host.
@@ -286,6 +286,6 @@ This phase examines one authorised subdomain in detail and preserves its context
     Review:
     - For each documented restricted area, record the documented behaviour, the observed behaviour, and the gap. A documented restriction the host contradicts is the highest-value lead on that host — prioritise it over everything the scanners produced.
     - Reconcile the documentation with the technology profile: docs describing an API, admin console, or integration that did not appear in `technology-notes.md` means either the docs are stale or the surface is hidden. Both are worth resolving.
-    - Check documented behaviour that the current code contradicts on the *sibling* surface. A changelog entry fixing access control on `/api/v2/export` implies `/api/v1/export` may never have been fixed.
+    - Check documented behaviour that the current code contradicts on the sibling surface. A changelog entry fixing access control on `/api/v2/export` implies `/api/v1/export` may never have been fixed.
     - Copy confirmed contradictions into `authorization.md` (role and permission mismatches), `api-notes.md` (undocumented or legacy endpoints), and `business-logic.md` (plan gating, feature flags, workflow rules). Add them to `interesting-endpoints.md` so they are not lost.
     - Use `Exploitation/attack-vectors.md` to convert the strongest contradictions into a defined goal and a chain before you start exploitation.
