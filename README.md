@@ -124,6 +124,8 @@ target.com/
 │           ├── cors-scan.txt
 │           ├── content-deep.json
 │           ├── content-api.json
+│           ├── documentation-notes.md
+│           ├── docs-permission-claims.txt
 │           ├── javascript-review.md
 │           └── technology-notes.md
 │
@@ -166,6 +168,8 @@ target.com/
 │
 ├── scope.md
 ├── out-of-scope.md
+├── attack-vectors.md
+├── impact.md
 ├── commands.md
 └── README.md
 ```
